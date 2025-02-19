@@ -28,39 +28,39 @@ then
 else
     echo "You are root user"
 fi
-dnf module disable nodejs -y
+dnf module disable nodejs -y &>> $LOGFILE
 
-VALIDATE $? "disabling current Nodejs" &>> $LOGFILE
+VALIDATE $? "disabling current Nodejs"
 
-dnf module enable nodejs:18 -y
+dnf module enable nodejs:18 -y &>> $LOGFILE
 
-VALIDATE $? "Enabling Nodejs:18" &>> $LOGFILE
+VALIDATE $? "Enabling Nodejs:18"
 
-dnf install nodejs -y
+dnf install nodejs -y &>> $LOGFILE
 
-VALIDATE $? "Installing Nodejs:18" &>> $LOGFILE
+VALIDATE $? "Installing Nodejs:18"
 
-useradd roboshop
+useradd roboshop &>> $LOGFILE
 
-VALIDATE $? "Creating roboshop user" &>> $LOGFILE
+VALIDATE $? "Creating roboshop user"
 
-mkdir /app
+mkdir /app &>> $LOGFILE
 
-VALIDATE $? "Creating app directory" &>> $LOGFILE
+VALIDATE $? "Creating app directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip
 
-VALIDATE $? "downloading catlouge application" &>> $LOGFILE
+VALIDATE $? "downloading catlouge application"
 
 cd /app 
 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>> $LOGFILE
 
-VALIDATE $? "unzipping catalouge" &>> $LOGFILE
+VALIDATE $? "unzipping catalouge"
 
-npm install 
+npm install &>> $LOGFILE
 
-VALIDATE $? "installing dependences" &>> $LOGFILE
+VALIDATE $? "installing dependences"
 
 cp /users/naren/devops/shell-script/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
 
@@ -68,7 +68,7 @@ VALIDATE $? "copying catalouge service file"
 
 systemctl daemon-reload  &>> $LOGFILE
 
-VALIDATE $? "catalouge daemon reload" &>> $LOGFILE
+VALIDATE $? "catalouge daemon reload"
 
 systemctl enable catalogue &>> $LOGFILE
 

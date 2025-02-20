@@ -40,9 +40,9 @@ dnf install nodejs -y &>> $LOGFILE
 
 VALIDATE $? "Installing Nodejs:18"
 
-useradd roboshop &>> $LOGFILE
+useradd roboshop
 
-VALIDATE $? "Creating roboshop user"
+VALIDATE $? "roboshop user creation"
 
 mkdir /app &>> $LOGFILE
 

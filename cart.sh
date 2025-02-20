@@ -40,7 +40,7 @@ dnf install nodejs -y &>> $LOGFILE
 
 VALIDATE $? "Installing Nodejs:18"
 
-useradd roboshop  &>> $LOGFILE
+useradd roboshop &>> $LOGFILE
 
 VALIDATE $? "roboshop user creation"
 
@@ -62,7 +62,7 @@ npm install &>> $LOGFILE
 
 VALIDATE $? "installing dependences"
 
-cp /users/naren/devops/shell-script/roboshop-shell/cart.service/etc/systemd/system/cart.service &>> $LOGFILE
+cp /users/naren/devops/shell-script/roboshop-shell/cart.service /etc/systemd/system/cart.service &>> $LOGFILE
 
 VALIDATE $? "copying cart service file"
 

@@ -34,7 +34,7 @@ dnf module disable mysql -y &>> $LOGFILE
 
 VALIDATE $? "Disable current MySQL version"
 
-cp my sql.repo /etc/yum.repos.d/mysql.repo &>> $LOGFILE
+cp /user/naren/devops/shell-script/roboshop-shell/sql.repo /etc/yum.repos.d/mysql.repo &>> $LOGFILE
 
 VALIDATE $? "Copied MySQl repo"
 

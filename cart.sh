@@ -6,6 +6,7 @@ G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
 
+
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
 
@@ -27,54 +28,63 @@ then
     exit 1 # you can give other than 0
 else
     echo "You are root user"
-fi
+fi # fi means reverse of if, indicating condition end
+
 dnf module disable nodejs -y &>> $LOGFILE
 
-VALIDATE $? "disabling current Nodejs"
+VALIDATE $? "Disabling current NodeJS"
 
-dnf module enable nodejs:18 -y &>> $LOGFILE
+dnf module enable nodejs:18 -y  &>> $LOGFILE
 
-VALIDATE $? "Enabling Nodejs:18"
+VALIDATE $? "Enabling NodeJS:18"
 
-dnf install nodejs -y &>> $LOGFILE
+dnf install nodejs -y  &>> $LOGFILE
 
-VALIDATE $? "Installing Nodejs:18"
+VALIDATE $? "Installing NodeJS:18"
 
-useradd roboshop &>> $LOGFILE
+id roboshop #if roboshop user does not exist, then it is failure
+if [ $? -ne 0 ]
+then
+    useradd roboshop
+    VALIDATE $? "roboshop user creation"
+else
+    echo -e "roboshop user already exist $Y SKIPPING $N"
+fi
 
-VALIDATE $? "roboshop user creation"
+mkdir -p /app
 
-mkdir /app &>> $LOGFILE
+VALIDATE $? "creating app directory"
 
-VALIDATE $? "Creating app directory"
+curl -o /tmp/cart.zip https://roboshop-builds.s3.amazonaws.com/cart.zip  &>> $LOGFILE
 
-curl -o /tmp/cart.zip https://roboshop-builds.s3.amazonaws.com/cart.zip &>> $LOGFILE
-
-VALIDATE $? "downloading cart application"
+VALIDATE $? "Downloading cart application"
 
 cd /app 
 
-unzip /tmp/cart.zip &>> $LOGFILE
+unzip -o /tmp/cart.zip  &>> $LOGFILE
 
 VALIDATE $? "unzipping cart"
 
-npm install &>> $LOGFILE
+npm install  &>> $LOGFILE
 
-VALIDATE $? "installing dependences"
+VALIDATE $? "Installing dependencies"
 
-cp /users/naren/devops/shell-script/roboshop-shell/cart.service /etc/systemd/system/cart.service &>> $LOGFILE
+# use absolute, because cart.service exists there
+cp /home/centos/roboshop-shell/cart.service /etc/systemd/system/cart.service &>> $LOGFILE
 
-VALIDATE $? "copying cart service file"
+VALIDATE $? "Copying cart service file"
 
-systemctl daemon-reload  &>> $LOGFILE
+systemctl daemon-reload &>> $LOGFILE
 
 VALIDATE $? "cart daemon reload"
 
 systemctl enable cart &>> $LOGFILE
 
-VALIDATE $? "enable cart"
+VALIDATE $? "Enable cart"
 
 systemctl start cart &>> $LOGFILE
 
-VALIDATE $? "starting cart"
+VALIDATE $? "Starting cart"
+
+
 

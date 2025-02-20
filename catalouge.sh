@@ -5,6 +5,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+MONGDB_HOST=mongodb.daws76s.online
 
 TIMESTAMP=$(date +%F-%H-%M-%S)
 LOGFILE="/tmp/$0-$TIMESTAMP.log"
@@ -27,65 +28,75 @@ then
     exit 1 # you can give other than 0
 else
     echo "You are root user"
-fi
+fi # fi means reverse of if, indicating condition end
+
 dnf module disable nodejs -y &>> $LOGFILE
 
-VALIDATE $? "disabling current Nodejs"
+VALIDATE $? "Disabling current NodeJS"
 
-dnf module enable nodejs:18 -y &>> $LOGFILE
+dnf module enable nodejs:18 -y  &>> $LOGFILE
 
-VALIDATE $? "Enabling Nodejs:18"
+VALIDATE $? "Enabling NodeJS:18"
 
-dnf install nodejs -y &>> $LOGFILE
+dnf install nodejs -y  &>> $LOGFILE
 
-VALIDATE $? "Installing Nodejs:18"
+VALIDATE $? "Installing NodeJS:18"
 
-useradd roboshop  &>> $LOGFILE
+id roboshop #if roboshop user does not exist, then it is failure
+if [ $? -ne 0 ]
+then
+    useradd roboshop
+    VALIDATE $? "roboshop user creation"
+else
+    echo -e "roboshop user already exist $Y SKIPPING $N"
+fi
 
-VALIDATE $? "roboshop user creation"
+mkdir -p /app
 
-mkdir /app &>> $LOGFILE
+VALIDATE $? "creating app directory"
 
-VALIDATE $? "Creating app directory"
+curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip  &>> $LOGFILE
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>> $LOGFILE
-
-VALIDATE $? "downloading catlouge application"
+VALIDATE $? "Downloading catalogue application"
 
 cd /app 
 
-unzip /tmp/catalogue.zip &>> $LOGFILE
+unzip -o /tmp/catalogue.zip  &>> $LOGFILE
 
-VALIDATE $? "unzipping catalouge"
+VALIDATE $? "unzipping catalogue"
 
-npm install &>> $LOGFILE
+npm install  &>> $LOGFILE
 
-VALIDATE $? "installing dependences"
+VALIDATE $? "Installing dependencies"
 
-cp /users/naren/devops/shell-script/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
+# use absolute, because catalogue.service exists there
+cp /c/users/naren/devops/shell-script/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
 
-VALIDATE $? "copying catalouge service file"
+VALIDATE $? "Copying catalogue service file"
 
-systemctl daemon-reload  &>> $LOGFILE
+systemctl daemon-reload &>> $LOGFILE
 
-VALIDATE $? "catalouge daemon reload"
+VALIDATE $? "catalogue daemon reload"
 
 systemctl enable catalogue &>> $LOGFILE
 
-VALIDATE $? "enable catalouge"
+VALIDATE $? "Enable catalogue"
 
 systemctl start catalogue &>> $LOGFILE
 
-VALIDATE $? "starting catalouge"
+VALIDATE $? "Starting catalogue"
 
-cp /users/naren/devops/shell-script/roboshop-shell/mongo.rep//etc/yum.repos.d/mongo.rep
+cp /c/users/naren/devops/shell-script/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo
 
-VALIDATE $? "copying mongodb.repo"
+VALIDATE $? "copying mongodb repo"
 
-dnf install mongodb-org-shell -y
+dnf install mongodb-org-shell -y &>> $LOGFILE
 
-VALIDATE $? "installing mongodb client"
+VALIDATE $? "Installing MongoDB client"
 
-mongo --host mongodb.daws76.space </app/schema/catalogue.js
+mongo --host $MONGDB_HOST </app/schema/catalogue.js &>> $LOGFILE
 
-VALIDATE $? "loading catalouge data into MongoDB"
+VALIDATE $? "Loading catalouge data into MongoDB"
+
+
+

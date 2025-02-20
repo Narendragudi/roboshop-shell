@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 ID=$(id -u)
 R="\e[31m"
@@ -62,7 +62,7 @@ npm install &>> $LOGFILE
 
 VALIDATE $? "installing dependences"
 
-cp /users/naren/devops/shell-script/roboshop-shell/cart.service /etc/systemd/system/cart.service &>> $LOGFILE
+cp /users/naren/devops/shell-script/roboshop-shell/cart.service/etc/systemd/system/cart.service &>> $LOGFILE
 
 VALIDATE $? "copying cart service file"
 
